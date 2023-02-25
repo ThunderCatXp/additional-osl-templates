@@ -1,0 +1,168 @@
+// Make glint reflections, ice, snow, and car shaders for example.
+// Flakes.osl, by Mads Drøschler
+// Modified: 2021-02-31
+// License MIT Copyright Mads Drøschler
+// https://github.com/gkmotu/OSL-Shaders
+// Modified: 2022-06-28 by Saul Espinosa for Redshift 3D. Added Page Metadata + Mapper Menu for Coordinate Space
+
+vector TileHash ( output vector x, int tileSize ) {
+
+	x = mod(x,tileSize);
+	return noise("hash",x);
+}
+
+vector ID(vector x, int seed,int Tiling,int tileSize)
+{
+    vector n = floor(x);
+    vector f = x-floor(x);
+    vector m = vector(8);
+    vector o;
+    for( int k=-1; k<=1; k++ ){
+    for( int j=-1; j<=1; j++ ){
+    for( int i=-1; i<=1; i++ ){
+    	
+    	vector g = vector( float(i), float(j),float(k) );  	
+    	Tiling? o = TileHash(n+g,tileSize) : o = noise("hash",n+g,seed);
+        vector r = g - f + (0.5+0.5*sin(M_2PI*o));
+        float s = dot(r, r);      
+        s<m[0] ? m = vector(s, o[0], o[1]):0;
+	}}}  
+	
+    return vector( sqrt(m[0]), m[1]+m[2], m[1]+m[0]);
+}
+
+float IDs ( output float x, int seed )
+{ 
+	x = -1000 + x * 2000;
+	x = int(trunc(x));	
+	float x_ratio = noise("cell", vector(abs(x), abs(seed), 11)); 
+	
+	return mix(0, 1, x_ratio);
+}	
+
+shader Flakes
+[[  string help = "Creates Paint Flake Noise Pattern",
+    string label = "Flakes" ]]
+(
+
+	// Inputs
+	float scale = 0.2
+	[[
+        string label = "Scale",
+        string page = "Flakes",
+		float min = 0.0,
+		float max = 25.0,
+	]],
+	
+	float density = 1.0
+	[[
+		string page = "Flakes",
+        string label = "Density",
+		float min = 0.0,
+		float max = 1.0,
+	]],
+	
+	float randomize = 0.5
+	[[
+        string page = "Flakes",		
+        string label = "Randomize",
+		float min = 0.0,
+		float max = 1.0,
+	]],
+	
+	int seed = 42
+	[[
+        string page = "Flakes",
+        string label = "Seed",
+		int min = 0,
+		int max = 100,
+	]],
+
+		int c_space = 0
+	[[
+        string page = "Flakes",
+		string label =		"Coordinate Space",
+		string widget =		"mapper", 
+		string options = 	"object:0|world:1|UV:2",
+	]],
+	
+
+	// 2D Baking Tiles
+	int Tiling = 0
+	[[
+        string page = "Tiles",
+		string widget = "checkBox",
+		string label = "Seamless Tiling",
+		string widget = "null",
+		int connectable = 0,
+	]],
+	
+	int tileSize = 10
+	[[
+        string page = "Tiles",
+        string label = "Tile Size",
+		int min = 10,
+		int max = 50,
+		int connectable = 0, 
+	]],
+	
+	
+	// Output
+	output normal outColor = 0.0,
+	output float outAlpha = 0,
+)
+{
+	// Coord Space
+	string mode;
+	point pos, s = P;
+	vector t = vector(u,v,0); 
+		
+	c_space == 0 ? mode = "object" : mode = "world";
+	c_space == 2 ? pos = transform("object",t) : pos = transform(mode,s);
+	Tiling ? pos = transform("object",t):0;
+
+	// Scale	
+	!Tiling ? pos = pos : pos = pos*tileSize;
+	float sc = scale;
+	!Tiling ? sc = sc : sc = 1.0;
+	
+	// Point
+	point p = (pos)/sc;
+    
+	// Base Normal	
+	vector Base_Normal = vector(0.5,0.5,1.0);
+	
+    // Fetch global ID
+    vector k = ID( p,seed,Tiling,tileSize );
+    
+    // Turn
+    float x = 0.5 + 0.5 * cos( k[1]*M_2PI );
+    float y = 0.5 + 0.5 * sin( k[1]*M_2PI );
+	float z = 0.5 + 0.5 * tan( k[1]*M_2PI );
+    
+    // Normalize
+    outColor = normalize(vector(x,y,z)*2-1)*0.5+0.5;  
+    
+    // Fetch xyz IDs        
+    outColor[0] = IDs(outColor[0],4);
+    outColor[1] = IDs(outColor[1],4);
+    outColor[2] = IDs(outColor[2],1);
+    // Fit z to 0.5 - 1.0
+    outColor[2] = 0.5 + 0.5 *outColor[2];
+    
+	// Density
+	float h = -1000 + outColor[0]*2000;
+	h = int(trunc(h));
+	float Rehash = noise("cell", vector(abs(h), abs(16), 11)); 
+	Rehash = mix(0, 1, Rehash);
+	density > Rehash ? outColor = outColor : outColor = Base_Normal;	
+	
+	// outAlpha
+	outColor[0] > 0.5 or outColor[0] < 0.5 ? outAlpha = 1 : outAlpha = 0;
+		
+	// Randomize
+	outColor = mix(Base_Normal,outColor,randomize);
+	//outColor = vector(1, 1, 0);
+
+	//outColor = outColor*2-1;	
+}

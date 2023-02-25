@@ -1,0 +1,72 @@
+// An UVW coordinate tranfrormation tool
+// UVWTransform.osl by Zap Andersson
+// Modified: 2019-11-27
+// Copyright 2019 Autodesk Inc, All rights reserved. This file is licensed under Apache 2.0 license
+//    https://github.com/ADN-DevTech/3dsMax-OSL-Shaders/blob/master/LICENSE.txt
+// Modified by Saul Espinosa for Redshift Renderer 2021-01-21 Added Extra Page Metadata
+
+shader UVWTransform
+[[ 
+   string label = "UVW Transform",
+   string category = "UVW Coordinates",
+   string version  = "2.1" 
+]]
+(
+	point  uvwInput = point(u, v, 0)
+	[[ 
+	string label = "Input UVW"
+	]],
+	
+	float  Scale = 1.0
+	[[ 
+	string page = "Adjustments" ,
+	float min = 0, float max = 25
+	]],
+	
+	vector Tiling = 1.0
+	[[ 
+	string page = "Adjustments" 
+	]],
+	
+	vector Offset = 0.0
+	[[ 
+	string page = "Adjustments" 
+	]],
+	
+	int    Wrap   = 0
+	[[ 
+	string widget = "checkBox",
+	string page = "Adjustments",
+	int connectable = 0,
+	]],
+	
+	float  Rotate = 0.0
+	[[
+	string page = "Rotation",
+	float min = -180, float max = 180
+	]],
+	
+	point  RotCenter = point(0.5,0.5,0)
+	[[ 
+	string label = "Rotation Center",
+	string page = "Rotation"
+	]],
+	
+	vector RotAxis   = vector(0.0,0.0,1.0)
+	[[ 
+	string label = "Rotation Axis",
+	string page = "Rotation"
+	]],
+
+// UVW Output
+	output point UVW = 0
+)
+{
+	vector worldScale = 1.0;
+	point Input = select(vector(u,v,0), uvwInput, isconnected(uvwInput));
+
+	UVW = rotate(Input - Offset, radians(Rotate), RotCenter, RotCenter + RotAxis) * Tiling / worldScale / Scale;
+
+	if (Wrap)
+	UVW -= floor(UVW);
+}

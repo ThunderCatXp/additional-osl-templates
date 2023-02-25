@@ -1,0 +1,20 @@
+/*
+ * original script from -
+ * http://www.openshading.com/osl/example-shaders/
+ * New/3-clause BSD" license
+ */
+
+shader HSVSplitter
+[[  string help = "Splits the RGB input into HSV Outputs",
+    string label = "HSV Splitter" ]]
+(
+    color Color = 0.8,
+    output float H = 0.0,
+    output float S = 0.0,
+    output float V = 0.0)
+{
+    color HSV = transformc("hsv", Color);
+    H = HSV[0];
+    S = HSV[1];
+    V = HSV[2];
+}
