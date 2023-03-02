@@ -2,7 +2,15 @@
 #  Thanks to https://github.com/sambler/osl-shaders and https://github.com/redshift3d/RedshiftOSLShaders#readme for
 #  collections of OSL shaders.
 
+
+# @ project     Additional OSL Templates.py
+#
+# @ author      Thunder Cat
+#
+# @ license     BSD
+
 import bpy
+
 bl_info = {
     "name": "Additional OSL Templates",
     "author": "Thunder Cat",
