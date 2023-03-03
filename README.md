@@ -11,3 +11,7 @@
 2.In Blender **Edit>Preferences>Add-ons** install **Additional  OSL Templates.py**.
 
 3.To use new templates go to **Scripting** in Blender and press **Templates** button in **Text Editor Menu**
+
+4.Tabs should now appear in **Templates** and look like this
+
+![image](https://user-images.githubusercontent.com/53365307/222833966-969bdca6-d800-4be0-bf09-181ea90bd2f6.png)
