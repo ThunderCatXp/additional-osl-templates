@@ -16,6 +16,6 @@
 
 ![image](https://user-images.githubusercontent.com/53365307/222833966-969bdca6-d800-4be0-bf09-181ea90bd2f6.png)
 
-## SMALL PART OF SHADERS: ##
+## SMALL PART OF ALL SHADERS: ##
 
 ![mats](https://user-images.githubusercontent.com/53365307/224825090-467a3534-51ff-40d3-a232-adce6fb65ed3.png)
