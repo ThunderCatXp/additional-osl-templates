@@ -1,4 +1,4 @@
-## Shader source links: ##
+## SHADERS SOURCE LINKS: ##
 
 [RedshiftOSLShaders](https://github.com/redshift3d/RedshiftOSLShaders)
 
@@ -15,3 +15,7 @@
 4.Tabs should now appear in **Templates** and look like this
 
 ![image](https://user-images.githubusercontent.com/53365307/222833966-969bdca6-d800-4be0-bf09-181ea90bd2f6.png)
+
+## SMALL PART OF SHADERS: ##
+
+![mats](https://user-images.githubusercontent.com/53365307/224825090-467a3534-51ff-40d3-a232-adce6fb65ed3.png)
